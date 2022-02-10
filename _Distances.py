@@ -13,7 +13,7 @@
 # VARIABLES ###############################################
 ###########################################################
 
-drive = "/Volumes/LaCie4Tb"
+drive = "/Volumes/SandiskSSD/"
 
 metadataFile = drive + "/OpenITI_TEMP/_RELEASE/metadata/OpenITI_metadata_2021-2-5.csv"
 releasePath = drive + "/OpenITI_TEMP/_RELEASE/"
@@ -29,13 +29,13 @@ foldersToCompare = [
     #drive + "/OpenITI_TEMP/RAWrabica035000/",
     #drive + "/OpenITI_TEMP/RAWrabica040000/",
     #drive + "/OpenITI_TEMP/RAWrabica045000/",
-    #drive + "/OpenITI_TEMP/RAWrabicaRafed/RAWrabicaRafed/",
+    #drive + "/OpenITI_TEMP/RAWrabicaRafed/",
     #drive + "/OpenITI_TEMP/RAWrabicaSham19Y/",
-    #drive + "/OpenITI_TEMP/raw_ShamelaY19/raw_ShamelaY19/",
-    #drive + "/OpenITI_TEMP/RAWrabicaShamAYtxt1/",
-    #drive + "/OpenITI_TEMP/RAWrabicaShamAYtxt2/",
-    #drive + "/OpenITI_TEMP/RAWrabicaShamAYtxt3/",
-    #drive + "/OpenITI_TEMP/RAW_ABLibrary/",
+    #drive + "/OpenITI_TEMP/raw_ShamelaY19/",
+    drive + "/OpenITI_TEMP/RAWrabicaShamAY1/",
+    drive + "/OpenITI_TEMP/RAWrabicaShamAY2/",
+    drive + "/OpenITI_TEMP/RAWrabicaShamAY3/",
+    drive + "/OpenITI_TEMP/RAW_ABLibrary/",
     drive + "/OpenITI_TEMP/RAW_Masaha/",
     #drive + "/OpenITI_TEMP/RAW_Ghbook/"
 ]
@@ -46,7 +46,7 @@ loadDataTestVar = 200000 # reduce this value for testing purposes; 200 --- will 
 minTFIDF = 0.001 # calculations are made on the vector of words with values higher than this parameter
 minCosine = 0.25 # 0.75 # items with distances below this will not be included in the final data;
 maxEuclidean = 125 # 1000 # items with distances above this will not be included in the final data;
-chunkLengths = 20000 # for chunking large matrices; no need to change this parameter
+chunkLengths = 5000 # for chunking large matrices; no need to change this parameter
 
 ###########################################################
 # VARIABLES ###############################################
@@ -83,6 +83,7 @@ def loaData(folderToCompare, limitForTest=20000):
     limCounter = limitForTest//2
     with open(metadataFile, 'r') as data:     
         for record in csv.DictReader(data, delimiter='\t'):
+            #if record["status"] == "pri" or record["status"] == "sec":
             if record["status"] == "pri" or record["status"] == "sec":
                 metadataDic[record["version_uri"]] = record
                 metadataDic[record["version_uri"]]["path"] = record["local_path"].replace("../", releasePath)
@@ -196,11 +197,11 @@ def docDistance(metadataDic, docList, docIdList, folderToCompare, matrixType, di
 
     # processing the matrix (or matrices, if the initial was too large)
     # running on DD matrix
+    distances = {}
     for i in indexGroupsList:
         print("\t\tgroup: %d" % counter)
         counter -= 1
 
-        distances = {}
 
         i = list(i)
         ar = i[0] + i[1]
@@ -241,37 +242,33 @@ def docDistance(metadataDic, docList, docIdList, folderToCompare, matrixType, di
             else:
                 distances[column] = tempDic
 
-        # input(distances)
-        #print("\tsaving cosine distances data...")
-        print("\tAggregating results into TSV format...")
-        tsvData = ["known\tunknown\t%s" % (matrixType + "_" + distanceType)]
+    # input(distances)
+    #print("\tsaving cosine distances data...")
+    print("\tAggregating results into TSV format...")
+    tsvData = ["known\tunknown\t%s" % (matrixType + "_" + distanceType)]
 
-        finalCountDown = len(metadataDic)
-        print("\tTo process: %d" % finalCountDown)
-        for column, results in distances.items():
-            finalCountDown -= 1
-            if finalCountDown % 1000 == 0:
-                print("\t\t%d remaining..." % finalCountDown)
-            # check if the text has a URI
-            #if re.search("^\d\d\d\d\w+\.\w+", column): # 
-            for text1, results1 in results.items():
-                for text2, distance in results1.items():
-                    #print(text1, text2, distance)
-                    if re.search("-ara\d+$", text2):
-                        pass
-                    else:
-                        if text1 != text2:
-                        #if 0 == 0:
-                            #print(text1, text2, distance)
-                            val = [text1, text2, str(distance)]
-                            tsvData.append("\t".join(val))
+    finalCountDown = len(distances)
+    print("\tTo process: %d" % finalCountDown)
+    for column, results in distances.items():
+        finalCountDown -= 1
+        if finalCountDown % 1000 == 0:
+            print("\t\t%d remaining..." % finalCountDown)
+        # check if the text has a URI
+        #if re.search("^\d\d\d\d\w+\.\w+", column): # 
+        for text1, results1 in results.items():
+            for text2, distance in results1.items():
+                #print(text1, text2, distance)
+                if re.search("-ara\d+$", text1):
+                    if not re.search("-ara\d+$", text2):
+                        val = [text1, text2, str(distance)]
+                        tsvData.append("\t".join(val))
 
-        finalData = "\n".join(tsvData)
-        suffix = folderToCompare.split("/")[-2]
-        fileFinal = "./results_raw/results_%s_%s_%s_%dchunks.tsv" % (suffix, matrixType, distanceType, maxChunkLen)
-        print("\tSaving results into a TSV file: " + fileFinal)
-        with open(fileFinal, "w", encoding="utf8") as f9:
-            f9.write(finalData)
+    finalData = "\n".join(tsvData)
+    suffix = folderToCompare.split("/")[-2]
+    fileFinal = "./results_raw/results_%s_%s_%s_%dchunks.tsv" % (suffix, matrixType, distanceType, maxChunkLen)
+    print("\tSaving results into a TSV file: " + fileFinal)
+    with open(fileFinal, "w", encoding="utf8") as f9:
+        f9.write(finalData)
 
 ###########################################################
 # RUNNING ALL #############################################

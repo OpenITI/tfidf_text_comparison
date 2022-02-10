@@ -22,23 +22,29 @@ Script report example:
 ## OpenITI RAW repos/folders:
 
 
-- RAW_ABLibrary
-- RAW_Masaha
-- raw_ShamelaY19
-- RAWrabica005000
-- RAWrabica010000
-- RAWrabica015000
-- RAWrabica020000
-- RAWrabica025000
-- RAWrabica030000
-- RAWrabica035000
-- RAWrabica040000
-- RAWrabica045000
-- RAWrabicaRafed
-- RAWrabicaSham19Y
-- RAWrabicaShamAY1
-- RAWrabicaShamAY2
-- RAWrabicaShamAY3
+## OpenITI RAW repos:
+
+- https://github.com/OpenITI/RELEASE.git
+
+- https://github.com/OpenITI/RAWrabica005000.git
+- https://github.com/OpenITI/RAWrabica010000.git
+- https://github.com/OpenITI/RAWrabica015000.git
+- https://github.com/OpenITI/RAWrabica015000.git
+- https://github.com/OpenITI/RAWrabica020000.git
+- https://github.com/OpenITI/RAWrabica025000.git
+- https://github.com/OpenITI/RAWrabica030000.git
+- https://github.com/OpenITI/RAWrabica035000.git
+- https://github.com/OpenITI/RAWrabica040000.git
+- https://github.com/OpenITI/RAWrabica045000.git
+
+- https://github.com/OpenITI/raw_SHAM19Y.git
+- https://github.com/OpenITI/RAWrabicaSham19Y.git
+- https://github.com/OpenITI/raw_ShamelaY19.git
+- https://github.com/OpenITI/RAWrabicaRafed.git
+- https://github.com/OpenITI/RAWrabicaShamAY1.git
+- https://github.com/OpenITI/RAWrabicaShamAY2.git
+- https://github.com/OpenITI/RAWrabicaShamAY3.git
+- https://github.com/OpenITI/RAW_Ghbook.git
 
 
 
